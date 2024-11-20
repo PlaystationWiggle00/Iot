@@ -2,28 +2,28 @@ import streamlit as st
 import pandas as pd
 
 # Título de la aplicación
-st.title("Calculadora de Producción para Tilapia, Trucha, Lechuga y Espinaca")
-st.write("Esta aplicación estima los costos y ganancias para la producción de tilapia, trucha, lechuga y espinaca en Perú.")
+st.title("Calculadora de Producción para Tilapia, Trucha, Lechuga y Espinaca en Perú")
+st.write("Esta aplicación estima los costos y ganancias para la producción de tilapia, trucha, lechuga y espinaca en el contexto peruano.")
 
 # Función para formatear números
 def formatear_numero(valor):
-    # Si es un número entero, no mostrar decimales
     if valor.is_integer():
         return f"S/ {int(valor):,}"
-    # Si tiene decimales, mostrarlos con dos cifras
     return f"S/ {valor:,.2f}"
 
 # Función para calcular producción de peces (por kilo)
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
     # Datos específicos por especie
     if especie == "Tilapia":
-        consumo_alimento_mensual = [0.5, 1.0, 1.5, 2.0]  # kg por pez por mes
-        tasa_mortalidad = 0.10  # 10%
-        peso_promedio = 1.2  # Peso en kg al momento de la venta
+        consumo_alimento_mensual = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]  # kg por pez por mes (6 meses)
+        tiempo_produccion = 6
+        tasa_mortalidad = 0.10
+        peso_promedio = 1.2  # kg por pez
     elif especie == "Trucha":
-        consumo_alimento_mensual = [0.6, 1.2, 1.8, 2.4]  # kg por pez por mes
-        tasa_mortalidad = 0.15  # 15%
-        peso_promedio = 1.5  # Peso en kg al momento de la venta
+        consumo_alimento_mensual = [0.6, 1.2, 1.8, 2.4, 2.8, 3.0, 3.5, 4.0]  # kg por pez por mes (8 meses)
+        tiempo_produccion = 8
+        tasa_mortalidad = 0.15
+        peso_promedio = 1.5  # kg por pez
     else:
         st.error("Especie no reconocida.")
         return
@@ -32,16 +32,15 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     costo_total_alevines = cantidad_alevines * costo_alevin
     consumo_alimento_total = [cantidad_alevines * consumo for consumo in consumo_alimento_mensual]
     consumo_alimento_total_sum = sum(consumo_alimento_total)
-    agua_necesaria = cantidad_alevines * 0.2  # m³
-    oxigeno_necesario = cantidad_alevines * 0.1  # L
+    agua_necesaria = cantidad_alevines * 0.2 * tiempo_produccion  # m³
+    oxigeno_necesario = cantidad_alevines * 0.1 * tiempo_produccion  # L
     costo_alimento = consumo_alimento_total_sum * 3.5  # S/ por kg de alimento
     costo_produccion = costo_total_alevines + costo_alimento
     cantidad_vendible = cantidad_alevines * (1 - tasa_mortalidad)
-    peso_total_vendible = cantidad_vendible * peso_promedio  # Total en kg para venta
+    peso_total_vendible = cantidad_vendible * peso_promedio
     ingreso_estimado = peso_total_vendible * precio_venta_kilo
     ganancia = ingreso_estimado - costo_produccion
 
-    # Resultados
     resultados = {
         "Costo Total de Alevines": formatear_numero(costo_total_alevines),
         "Consumo de Alimento por Mes (kg)": consumo_alimento_total,
@@ -52,35 +51,34 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         "Costo Total de Producción": formatear_numero(costo_produccion),
         "Peso Total Vendible (kg)": peso_total_vendible,
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
-        "Ganancia Estimada": formatear_numero(ganancia)
+        "Ganancia Estimada": formatear_numero(ganancia),
     }
     return resultados
 
 # Función para calcular producción de vegetales
 def calcular_produccion_vegetales(especie, cantidad_semillas, costo_semilla, precio_venta):
-    # Datos específicos por especie
     if especie == "Lechuga":
-        consumo_nutrientes_mensual = [0.05, 0.07]  # kg por planta por mes
-        tasa_perdida = 0.05  # 5%
+        consumo_nutrientes_mensual = [0.05, 0.07, 0.09]  # kg por planta por mes (3 meses)
+        tiempo_produccion = 3
+        tasa_perdida = 0.05
     elif especie == "Espinaca":
-        consumo_nutrientes_mensual = [0.04, 0.06]  # kg por planta por mes
-        tasa_perdida = 0.07  # 7%
+        consumo_nutrientes_mensual = [0.04, 0.06, 0.08, 0.1]  # kg por planta por mes (4 meses)
+        tiempo_produccion = 4
+        tasa_perdida = 0.07
     else:
         st.error("Especie no reconocida.")
         return
 
-    # Cálculos
     costo_total_semillas = cantidad_semillas * costo_semilla
     consumo_nutrientes_total = [cantidad_semillas * consumo for consumo in consumo_nutrientes_mensual]
     consumo_nutrientes_total_sum = sum(consumo_nutrientes_total)
-    agua_necesaria = cantidad_semillas * 0.1  # m³
+    agua_necesaria = cantidad_semillas * 0.1 * tiempo_produccion  # m³
     costo_nutrientes = consumo_nutrientes_total_sum * 2.0  # S/ por kg de nutrientes
     costo_produccion = costo_total_semillas + costo_nutrientes
     cantidad_vendible = cantidad_semillas * (1 - tasa_perdida)
     ingreso_estimado = cantidad_vendible * precio_venta
     ganancia = ingreso_estimado - costo_produccion
 
-    # Resultados
     resultados = {
         "Costo Total de Semillas": formatear_numero(costo_total_semillas),
         "Consumo de Nutrientes por Mes (kg)": consumo_nutrientes_total,
@@ -90,14 +88,13 @@ def calcular_produccion_vegetales(especie, cantidad_semillas, costo_semilla, pre
         "Costo Total de Producción": formatear_numero(costo_produccion),
         "Cantidad Vendible (unidades)": cantidad_vendible,
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
-        "Ganancia Estimada": formatear_numero(ganancia)
+        "Ganancia Estimada": formatear_numero(ganancia),
     }
     return resultados
 
 # Selección de producto
 producto = st.selectbox("Selecciona el producto", ["Tilapia", "Trucha", "Lechuga", "Espinaca"])
 
-# Entrada de datos según el producto
 if producto in ["Tilapia", "Trucha"]:
     st.subheader(f"Producción de {producto}")
     cantidad_alevines = st.number_input("Cantidad de Alevines", min_value=1, step=1)
