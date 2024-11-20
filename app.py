@@ -7,31 +7,33 @@ st.write("Esta aplicación estima los costos y ganancias para la producción de 
 
 # Función para formatear números
 def formatear_numero(valor):
+    # Si es un número entero, no mostrar decimales
+    if valor.is_integer():
+        return f"S/ {int(valor):,}"
+    # Si tiene decimales, mostrarlos con dos cifras
     return f"S/ {valor:,.2f}"
 
 # Función para calcular producción de peces (por kilo)
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
     # Datos específicos por especie
     if especie == "Tilapia":
-        consumo_alimento_mensual = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]  # kg por pez por mes
-        tiempo_cria = 6  # meses
+        consumo_alimento_mensual = [0.5, 1.0, 1.5, 2.0]  # kg por pez por mes
         tasa_mortalidad = 0.10  # 10%
-        peso_promedio = 0.3  # Peso en kg al momento de la venta
+        peso_promedio = 1.2  # Peso en kg al momento de la venta
     elif especie == "Trucha":
-        consumo_alimento_mensual = [0.6, 1.2, 1.8, 2.4, 3.0, 3.5, 4.0, 4.5]  # kg por pez por mes
-        tiempo_cria = 8  # meses
+        consumo_alimento_mensual = [0.6, 1.2, 1.8, 2.4]  # kg por pez por mes
         tasa_mortalidad = 0.15  # 15%
-        peso_promedio = 1.0  # Peso en kg al momento de la venta
+        peso_promedio = 1.5  # Peso en kg al momento de la venta
     else:
         st.error("Especie no reconocida.")
         return
 
     # Cálculos
     costo_total_alevines = cantidad_alevines * costo_alevin
-    consumo_alimento_total = [cantidad_alevines * consumo for consumo in consumo_alimento_mensual[:tiempo_cria]]
+    consumo_alimento_total = [cantidad_alevines * consumo for consumo in consumo_alimento_mensual]
     consumo_alimento_total_sum = sum(consumo_alimento_total)
-    agua_necesaria = cantidad_alevines * 0.2 * tiempo_cria  # m³ totales
-    oxigeno_necesario = cantidad_alevines * 0.1 * tiempo_cria  # L totales
+    agua_necesaria = cantidad_alevines * 0.2  # m³
+    oxigeno_necesario = cantidad_alevines * 0.1  # L
     costo_alimento = consumo_alimento_total_sum * 3.5  # S/ por kg de alimento
     costo_produccion = costo_total_alevines + costo_alimento
     cantidad_vendible = cantidad_alevines * (1 - tasa_mortalidad)
@@ -42,13 +44,13 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     # Resultados
     resultados = {
         "Costo Total de Alevines": formatear_numero(costo_total_alevines),
-        "Consumo de Alimento por Mes (kg)": [f"{consumo:.2f} kg" for consumo in consumo_alimento_total],
-        "Consumo Total de Alimento (kg)": f"{consumo_alimento_total_sum:.2f} kg",
-        "Agua Necesaria (m³)": f"{agua_necesaria:.2f}",
-        "Oxígeno Necesario (L)": f"{oxigeno_necesario:.2f}",
+        "Consumo de Alimento por Mes (kg)": consumo_alimento_total,
+        "Consumo Total de Alimento (kg)": consumo_alimento_total_sum,
+        "Agua Necesaria (m³)": agua_necesaria,
+        "Oxígeno Necesario (L)": oxigeno_necesario,
         "Costo de Alimento": formatear_numero(costo_alimento),
         "Costo Total de Producción": formatear_numero(costo_produccion),
-        "Peso Total Vendible (kg)": f"{peso_total_vendible:.2f} kg",
+        "Peso Total Vendible (kg)": peso_total_vendible,
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
         "Ganancia Estimada": formatear_numero(ganancia)
     }
@@ -81,12 +83,12 @@ def calcular_produccion_vegetales(especie, cantidad_semillas, costo_semilla, pre
     # Resultados
     resultados = {
         "Costo Total de Semillas": formatear_numero(costo_total_semillas),
-        "Consumo de Nutrientes por Mes (kg)": [f"{consumo:.2f} kg" for consumo in consumo_nutrientes_total],
-        "Consumo Total de Nutrientes (kg)": f"{consumo_nutrientes_total_sum:.2f} kg",
-        "Agua Necesaria (m³)": f"{agua_necesaria:.2f}",
+        "Consumo de Nutrientes por Mes (kg)": consumo_nutrientes_total,
+        "Consumo Total de Nutrientes (kg)": consumo_nutrientes_total_sum,
+        "Agua Necesaria (m³)": agua_necesaria,
         "Costo de Nutrientes": formatear_numero(costo_nutrientes),
         "Costo Total de Producción": formatear_numero(costo_produccion),
-        "Cantidad Vendible (unidades)": f"{cantidad_vendible:.0f} unidades",
+        "Cantidad Vendible (unidades)": cantidad_vendible,
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
         "Ganancia Estimada": formatear_numero(ganancia)
     }
