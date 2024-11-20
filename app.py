@@ -26,18 +26,24 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         fca = 1.4
         costo_alimento_por_kg = 4.0
         tiempo_produccion = 8
+        costo_oxigeno = 0.5  # S/ por pez por mes (trucha requiere oxigenación)
     else:
         st.error("Especie no reconocida.")
         return
 
-    # Cálculos
+    # Cálculos generales
     peces_vendibles = cantidad_alevines * (1 - tasa_mortalidad)
     peso_total_vendible = peces_vendibles * peso_promedio
     alimento_total = peso_total_vendible * fca
     costo_alimento = alimento_total * costo_alimento_por_kg
     costo_total_alevines = cantidad_alevines * costo_alevin
-    otros_costos = 0.2 * (costo_total_alevines + costo_alimento)  # Otros costos adicionales (electricidad, mantenimiento)
-    costo_total_produccion = costo_total_alevines + costo_alimento + otros_costos
+    if especie == "Trucha":
+        oxigeno_total = cantidad_alevines * costo_oxigeno * tiempo_produccion
+    else:
+        oxigeno_total = 0
+
+    otros_costos = 0.2 * (costo_total_alevines + costo_alimento)  # Electricidad, mantenimiento
+    costo_total_produccion = costo_total_alevines + costo_alimento + oxigeno_total + otros_costos
     ingreso_estimado = peso_total_vendible * precio_venta_kilo
     ganancia = ingreso_estimado - costo_total_produccion
 
@@ -47,6 +53,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         "Consumo Total de Alimento (kg)": alimento_total,
         "Costo de Alimentación": formatear_numero(costo_alimento),
         "Costo Total de Alevines": formatear_numero(costo_total_alevines),
+        "Costo Total de Oxígeno": formatear_numero(oxigeno_total),
         "Otros Costos (Electricidad, Mantenimiento)": formatear_numero(otros_costos),
         "Costo Total de Producción": formatear_numero(costo_total_produccion),
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
@@ -60,23 +67,28 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
         tiempo_produccion = 2
         tasa_perdida = 0.05
         costo_nutrientes = 0.2
+        consumo_agua_por_mes = 0.7  # litros por planta
     elif especie == "Espinaca":
         tiempo_produccion = 1.5
         tasa_perdida = 0.07
         costo_nutrientes = 0.15
+        consumo_agua_por_mes = 0.6  # litros por planta
     else:
         st.error("Especie no reconocida.")
         return
 
+    # Cálculos generales
     plantas_vendibles = cantidad_plantas * (1 - tasa_perdida)
     costo_total_semillas = cantidad_plantas * costo_semilla
     costo_total_nutrientes = cantidad_plantas * costo_nutrientes
+    consumo_total_agua = cantidad_plantas * consumo_agua_por_mes * tiempo_produccion
     costo_total_produccion = costo_total_semillas + costo_total_nutrientes
     ingreso_estimado = plantas_vendibles * precio_venta
     ganancia = ingreso_estimado - costo_total_produccion
 
     resultados = {
         "Plantas Vendibles (unidades)": int(plantas_vendibles),
+        "Consumo Total de Agua (litros)": consumo_total_agua,
         "Costo Total de Semillas": formatear_numero(costo_total_semillas),
         "Costo Total de Nutrientes": formatear_numero(costo_total_nutrientes),
         "Costo Total de Producción": formatear_numero(costo_total_produccion),
