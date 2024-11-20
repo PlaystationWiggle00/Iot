@@ -20,14 +20,14 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         fca = 1.6  # Factor de Conversión Alimenticia
         costo_alimento_por_kg = 3.5  # S/ por kg de alimento
         tiempo_produccion = 6  # meses
-        consumo_alimento_mensual = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]  # Consumo en kg por pez por mes
+        consumo_alimento_mensual = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]  # kg por pez por mes
     elif especie == "Trucha":
         peso_promedio = 0.6  # kg por pez
         tasa_mortalidad = 0.15  # 15%
         fca = 1.4  # Factor de Conversión Alimenticia
         costo_alimento_por_kg = 4.0  # S/ por kg de alimento
         tiempo_produccion = 8  # meses
-        consumo_alimento_mensual = [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7]  # Consumo en kg por pez por mes
+        consumo_alimento_mensual = [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7]  # kg por pez por mes
     else:
         st.error("Especie no reconocida.")
         return
@@ -77,6 +77,7 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
         st.error("Especie no reconocida.")
         return
 
+    # Cálculos
     plantas_vendibles = cantidad_plantas * (1 - tasa_perdida)
     gasto_mensual = [costo_nutrientes_por_planta * cantidad_plantas for _ in range(int(tiempo_produccion))]
     consumo_agua_total = cantidad_plantas * consumo_agua_por_mes * tiempo_produccion
