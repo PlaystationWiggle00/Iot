@@ -7,10 +7,16 @@ st.write("Esta herramienta permite calcular costos, ingresos y ganancias de mane
 
 # Función para formatear números
 def formatear_numero(valor):
-    if isinstance(valor, int):
-        return f"S/ {valor:,}"
+    if isinstance(valor, int) or valor.is_integer():
+        return f"S/ {int(valor):,}"
     else:
         return f"S/ {valor:,.2f}"
+
+def redondear_cantidad(valor):
+    if isinstance(valor, int) or valor.is_integer():
+        return int(valor)
+    else:
+        return round(valor, 2)
 
 # Función para producción de peces
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
@@ -45,9 +51,9 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     ganancia = ingreso_estimado - costo_total_produccion
 
     resultados = {
-        "Peces Vendibles": int(peces_vendibles),
-        "Peso Total Vendible (kg)": peso_total_vendible,
-        "Consumo Total de Alimento (kg)": alimento_total,
+        "Peces Vendibles": redondear_cantidad(peces_vendibles),
+        "Peso Total Vendible (kg)": redondear_cantidad(peso_total_vendible),
+        "Consumo Total de Alimento (kg)": redondear_cantidad(alimento_total),
         "Costo de Alimentación": formatear_numero(costo_alimento),
         "Costo Total de Alevines": formatear_numero(costo_total_alevines),
         "Otros Costos (Electricidad, Mantenimiento)": formatear_numero(otros_costos),
@@ -57,8 +63,8 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     }
 
     tablas = {
-        "Consumo de Alimento Mensual (kg)": consumo_total_mensual,
-        "Gasto Mensual en Alimento (S/)": [mes * costo_alimento_por_kg for mes in consumo_total_mensual],
+        "Consumo de Alimento Mensual (kg)": [redondear_cantidad(mes) for mes in consumo_total_mensual],
+        "Gasto Mensual en Alimento (S/)": [formatear_numero(mes * costo_alimento_por_kg) for mes in consumo_total_mensual],
     }
     return resultados, tablas
 
@@ -81,15 +87,15 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
     plantas_vendibles = cantidad_plantas * (1 - tasa_perdida)
     costo_total_semillas = cantidad_plantas * costo_semilla
     costo_total_nutrientes = cantidad_plantas * costo_nutrientes
-    gasto_mensual = [costo_nutrientes * cantidad_plantas for _ in range(int(tiempo_produccion))]
+    gasto_mensual = [formatear_numero(costo_nutrientes * cantidad_plantas) for _ in range(int(tiempo_produccion))]
     consumo_total_agua = cantidad_plantas * consumo_agua_por_mes * tiempo_produccion
     costo_total_produccion = costo_total_semillas + costo_total_nutrientes
     ingreso_estimado = plantas_vendibles * precio_venta
     ganancia = ingreso_estimado - costo_total_produccion
 
     resultados = {
-        "Plantas Vendibles (unidades)": int(plantas_vendibles),
-        "Consumo Total de Agua (litros)": consumo_total_agua,
+        "Plantas Vendibles (unidades)": redondear_cantidad(plantas_vendibles),
+        "Consumo Total de Agua (litros)": redondear_cantidad(consumo_total_agua),
         "Costo Total de Semillas": formatear_numero(costo_total_semillas),
         "Costo Total de Nutrientes": formatear_numero(costo_total_nutrientes),
         "Costo Total de Producción": formatear_numero(costo_total_produccion),
