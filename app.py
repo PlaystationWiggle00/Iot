@@ -39,8 +39,8 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     alimento_total = sum(consumo_total_mensual)
     costo_alimento = alimento_total * costo_alimento_por_kg
     costo_total_alevines = cantidad_alevines * costo_alevin
-    gasto_mensual = [mes * costo_alimento_por_kg for mes in consumo_total_mensual]
-    costo_total_produccion = costo_total_alevines + costo_alimento
+    otros_costos = 0.2 * (costo_alimento + costo_total_alevines)
+    costo_total_produccion = costo_alimento + costo_total_alevines + otros_costos
     ingreso_estimado = peso_total_vendible * precio_venta_kilo
     ganancia = ingreso_estimado - costo_total_produccion
 
@@ -50,6 +50,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         "Consumo Total de Alimento (kg)": alimento_total,
         "Costo de Alimentación": formatear_numero(costo_alimento),
         "Costo Total de Alevines": formatear_numero(costo_total_alevines),
+        "Otros Costos (Electricidad, Mantenimiento)": formatear_numero(otros_costos),
         "Costo Total de Producción": formatear_numero(costo_total_produccion),
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
         "Ganancia Estimada": formatear_numero(ganancia),
@@ -57,7 +58,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
 
     tablas = {
         "Consumo de Alimento Mensual (kg)": consumo_total_mensual,
-        "Gasto Mensual en Alimento (S/)": gasto_mensual,
+        "Gasto Mensual en Alimento (S/)": [mes * costo_alimento_por_kg for mes in consumo_total_mensual],
     }
     return resultados, tablas
 
