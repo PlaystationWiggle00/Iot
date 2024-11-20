@@ -20,12 +20,14 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         fca = 1.6  # Factor de Conversión Alimenticia
         costo_alimento_por_kg = 3.5  # S/ por kg de alimento
         tiempo_produccion = 6  # meses
+        consumo_alimento_mensual = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2]  # Consumo en kg por pez por mes
     elif especie == "Trucha":
         peso_promedio = 0.6  # kg por pez
         tasa_mortalidad = 0.15  # 15%
         fca = 1.4  # Factor de Conversión Alimenticia
         costo_alimento_por_kg = 4.0  # S/ por kg de alimento
         tiempo_produccion = 8  # meses
+        consumo_alimento_mensual = [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7]  # Consumo en kg por pez por mes
     else:
         st.error("Especie no reconocida.")
         return
@@ -33,9 +35,11 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     # Cálculos
     peces_vendibles = cantidad_alevines * (1 - tasa_mortalidad)
     peso_total_vendible = peces_vendibles * peso_promedio
-    alimento_total = peso_total_vendible * fca
+    consumo_total_mensual = [cantidad_alevines * consumo for consumo in consumo_alimento_mensual]
+    alimento_total = sum(consumo_total_mensual)
     costo_alimento = alimento_total * costo_alimento_por_kg
     costo_total_alevines = cantidad_alevines * costo_alevin
+    gasto_mensual = [mes * costo_alimento_por_kg for mes in consumo_total_mensual]
     costo_produccion = costo_total_alevines + costo_alimento
     ingreso_estimado = peso_total_vendible * precio_venta_kilo
     ganancia = ingreso_estimado - costo_produccion
@@ -50,7 +54,12 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
         "Ganancia Estimada": formatear_numero(ganancia),
     }
-    return resultados
+
+    tablas = {
+        "Consumo de Alimento Mensual (kg)": consumo_total_mensual,
+        "Gasto Mensual en Alimento (S/)": gasto_mensual,
+    }
+    return resultados, tablas
 
 # Función para calcular producción de vegetales
 def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, precio_venta):
@@ -68,8 +77,8 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
         st.error("Especie no reconocida.")
         return
 
-    # Cálculos
     plantas_vendibles = cantidad_plantas * (1 - tasa_perdida)
+    gasto_mensual = [costo_nutrientes_por_planta * cantidad_plantas for _ in range(int(tiempo_produccion))]
     consumo_agua_total = cantidad_plantas * consumo_agua_por_mes * tiempo_produccion
     costo_nutrientes = cantidad_plantas * costo_nutrientes_por_planta
     costo_total_semillas = cantidad_plantas * costo_semilla
@@ -86,7 +95,11 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
         "Ingreso Estimado": formatear_numero(ingreso_estimado),
         "Ganancia Estimada": formatear_numero(ganancia),
     }
-    return resultados
+
+    tablas = {
+        "Gasto Mensual en Nutrientes (S/)": gasto_mensual,
+    }
+    return resultados, tablas
 
 # Selección de producto
 producto = st.selectbox("Selecciona el producto", ["Tilapia", "Trucha", "Lechuga", "Espinaca"])
@@ -97,11 +110,16 @@ if producto in ["Tilapia", "Trucha"]:
     costo_alevin = st.number_input("Costo por Alevín (S/)", min_value=0.0, step=0.1)
     precio_venta_kilo = st.number_input("Precio de Venta por Kilo (S/)", min_value=0.0, step=0.1)
     if st.button(f"Calcular Producción de {producto}"):
-        resultados = calcular_produccion_peces(producto, cantidad_alevines, costo_alevin, precio_venta_kilo)
+        resultados, tablas = calcular_produccion_peces(producto, cantidad_alevines, costo_alevin, precio_venta_kilo)
         if resultados:
-            st.subheader("Resultados")
+            st.subheader("Resultados Generales")
             for key, value in resultados.items():
                 st.write(f"{key}: {value}")
+            st.subheader("Tablas Detalladas")
+            for key, value in tablas.items():
+                st.write(key)
+                df = pd.DataFrame({f"Mes {i+1}": [v] for i, v in enumerate(value)})
+                st.table(df)
 
 elif producto in ["Lechuga", "Espinaca"]:
     st.subheader(f"Producción Realista de {producto}")
@@ -109,8 +127,13 @@ elif producto in ["Lechuga", "Espinaca"]:
     costo_semilla = st.number_input("Costo por Semilla (S/)", min_value=0.0, step=0.1)
     precio_venta = st.number_input("Precio de Venta por Unidad (S/)", min_value=0.0, step=0.1)
     if st.button(f"Calcular Producción de {producto}"):
-        resultados = calcular_produccion_vegetales(producto, cantidad_plantas, costo_semilla, precio_venta)
+        resultados, tablas = calcular_produccion_vegetales(producto, cantidad_plantas, costo_semilla, precio_venta)
         if resultados:
-            st.subheader("Resultados")
+            st.subheader("Resultados Generales")
             for key, value in resultados.items():
                 st.write(f"{key}: {value}")
+            st.subheader("Tablas Detalladas")
+            for key, value in tablas.items():
+                st.write(key)
+                df = pd.DataFrame({f"Mes {i+1}": [v] for i, v in enumerate(value)})
+                st.table(df)
