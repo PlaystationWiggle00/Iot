@@ -5,12 +5,12 @@ import pandas as pd
 st.title("Calculadora de Producción para Tilapia y Trucha en Perú")
 st.write("Esta herramienta calcula costos, ingresos y ganancias para la producción de peces.")
 
-# Formato de números
+# Formato de números (sin decimales)
 def formatear_numero(valor):
-    return f"S/ {valor:,.2f}"  # Formato con dos decimales
+    return f"S/ {int(round(valor)):,}".replace(",", ".")
 
 def redondear_cantidad(valor):
-    return round(valor, 2)  # Redondeo a dos decimales para resultados numéricos
+    return int(round(valor))  # Redondeo a enteros para resultados numéricos
 
 # Producción de peces
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
@@ -63,7 +63,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
 
     # Resultados generales
     resultados = {
-        "Peces Vendibles": int(peces_vendibles),  # Entero porque son peces
+        "Peces Vendibles": redondear_cantidad(peces_vendibles),  # Entero porque son peces
         "Peso Total Vendible (kg)": redondear_cantidad(peso_total_vendible),
         "Consumo Total de Alimento (kg)": redondear_cantidad(consumo_total),
         "Costo Total Alimentación": formatear_numero(costo_total_alimento),
