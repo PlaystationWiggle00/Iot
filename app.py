@@ -5,7 +5,7 @@ import pandas as pd
 st.title("Calculadora de Producción para Tilapia y Trucha en Perú")
 st.write("Esta herramienta calcula costos, ingresos y ganancias para la producción de peces.")
 
-# Formateo de números
+# Formato de números
 def formatear_numero(valor):
     return f"S/ {valor:,.2f}"
 
