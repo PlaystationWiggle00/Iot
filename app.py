@@ -1,33 +1,33 @@
 import streamlit as st
 import pandas as pd
 
-# Título
+
 st.title("Calculadora de Producción para Tilapia, Trucha, Lechuga y Espinaca en Perú")
 st.write("Esta herramienta calcula costos, ingresos y ganancias para la producción de peces y vegetales.")
 
-# Formato de números (sin decimales)
+
 def formatear_numero(valor):
     return f"S/ {int(valor):,}".replace(",", ".")
 
 def redondear_cantidad(valor):
-    return int(valor)  # Redondeo a enteros para resultados numéricos sin decimales
+    return int(valor) 
 
-# Producción de peces
+
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
     parametros = {
         "Tilapia": {
-            "peso_promedio": 0.52,  # kg por pez al final del ciclo
+            "peso_promedio": 0.52, 
             "tasa_mortalidad": 0.073,
-            "fca": 1.23,  # Factor de conversión alimenticia
-            "costo_alimento_por_kg": 6.30,  # S/
+            "fca": 1.23,  
+            "costo_alimento_por_kg": 6.30,  
             "meses_produccion": 6,
-            "consumo_mensual": [0.2, 0.4, 0.6, 0.8, 1.0, 1.2],  # Consumo mensual de alimento (kg por pez)
+            "consumo_mensual": [0.2, 0.4, 0.6, 0.8, 1.0, 1.2], 
         },
         "Trucha": {
-            "peso_promedio": 0.6,  # kg por pez al final del ciclo
+            "peso_promedio": 0.6, 
             "tasa_mortalidad": 0.15,
             "fca": 1.4,
-            "costo_alimento_por_kg": 4.00,  # S/
+            "costo_alimento_por_kg": 4.00,  
             "meses_produccion": 8,
             "consumo_mensual": [0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7],
         },
@@ -69,19 +69,19 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
 
     return resultados, tabla_consumo
 
-# Producción de vegetales (Lechuga, Espinaca) - Ambas con ciclo de 2 meses
+
 def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, precio_venta):
     parametros = {
         "Lechuga": {
             "meses_produccion": 2,
             "tasa_perdida": 0.05,
-            "consumo_agua_mensual": 0.7,  # Litros por planta
+            "consumo_agua_mensual": 0.7,  
             "costo_nutrientes": 0.2,
         },
         "Espinaca": {
-            "meses_produccion": 2,  # Ahora Espinaca también tiene un ciclo de 2 meses
+            "meses_produccion": 2, 
             "tasa_perdida": 0.07,
-            "consumo_agua_mensual": 0.6,  # Litros por planta
+            "consumo_agua_mensual": 0.6, 
             "costo_nutrientes": 0.15,
         },
     }
@@ -95,7 +95,7 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
     plantas_vendibles = cantidad_plantas * (1 - datos["tasa_perdida"])
     consumo_total_agua = cantidad_plantas * datos["consumo_agua_mensual"] * datos["meses_produccion"]
     
-    # Para ambos ciclos (Lechuga y Espinaca), el costo de nutrientes se distribuye entre los 2 meses
+ 
     consumo_nutrientes_mes_1 = cantidad_plantas * datos["costo_nutrientes"]
     consumo_nutrientes_mes_2 = cantidad_plantas * datos["costo_nutrientes"]
 
@@ -115,10 +115,10 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
         "Ganancia Estimada": formatear_numero(ganancia),
     }
 
-    # Ahora creamos una tabla detallada para Consumo de Agua y Costo de Nutrientes
-    meses = int(datos["meses_produccion"])  # Número de meses de producción (2 meses)
+   
+    meses = int(datos["meses_produccion"])  
     
-    # Ajustamos para mostrar dos filas, distribuyendo el consumo de agua y nutrientes
+  
     consumo_agua_mes = consumo_total_agua / meses
     tabla_consumo = pd.DataFrame({
         "Mes": [1, 2],
@@ -128,7 +128,7 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
 
     return resultados, tabla_consumo
 
-# Selección de producto
+
 producto = st.selectbox("Selecciona el producto", ["Tilapia", "Trucha", "Lechuga", "Espinaca"])
 
 if producto in ["Tilapia", "Trucha"]:
