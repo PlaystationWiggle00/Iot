@@ -69,7 +69,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
 
     return resultados, tabla_consumo
 
-# Producción de vegetales (Lechuga, Espinaca)
+# Producción de vegetales (Lechuga, Espinaca) - Ambas con ciclo de 2 meses
 def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, precio_venta):
     parametros = {
         "Lechuga": {
@@ -79,7 +79,7 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
             "costo_nutrientes": 0.2,
         },
         "Espinaca": {
-            "meses_produccion": 1.5,
+            "meses_produccion": 2,  # Ahora Espinaca también tiene un ciclo de 2 meses
             "tasa_perdida": 0.07,
             "consumo_agua_mensual": 0.6,  # Litros por planta
             "costo_nutrientes": 0.15,
@@ -95,20 +95,11 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
     plantas_vendibles = cantidad_plantas * (1 - datos["tasa_perdida"])
     consumo_total_agua = cantidad_plantas * datos["consumo_agua_mensual"] * datos["meses_produccion"]
     
-    # Ajustamos el consumo de nutrientes según el mes:
-    if datos["meses_produccion"] == 1.5:  # Para Espinaca con ciclo de 1.5 meses
-        consumo_nutrientes_mes_1 = 0.7 * cantidad_plantas * datos["costo_nutrientes"]
-        consumo_nutrientes_mes_2 = 0.3 * cantidad_plantas * datos["costo_nutrientes"]
-    else:
-        consumo_nutrientes_mes_1 = cantidad_plantas * datos["costo_nutrientes"]
-        consumo_nutrientes_mes_2 = 0  # Para 2 meses, solo calculamos una vez.
+    # Para ambos ciclos (Lechuga y Espinaca), el costo de nutrientes se distribuye entre los 2 meses
+    consumo_nutrientes_mes_1 = cantidad_plantas * datos["costo_nutrientes"]
+    consumo_nutrientes_mes_2 = cantidad_plantas * datos["costo_nutrientes"]
 
-    # Ajustamos para que el costo de nutrientes no sea 0 en el segundo mes
-    if datos["meses_produccion"] == 1.5:
-        costo_total_nutrientes = consumo_nutrientes_mes_1 + consumo_nutrientes_mes_2
-    else:
-        costo_total_nutrientes = consumo_nutrientes_mes_1  # Para Lechuga, que tiene 2 meses de ciclo
-
+    costo_total_nutrientes = consumo_nutrientes_mes_1 + consumo_nutrientes_mes_2
     costo_total_semillas = cantidad_plantas * costo_semilla
     costo_total_produccion = costo_total_nutrientes + costo_total_semillas
     ingreso_estimado = plantas_vendibles * precio_venta
@@ -125,12 +116,12 @@ def calcular_produccion_vegetales(especie, cantidad_plantas, costo_semilla, prec
     }
 
     # Ahora creamos una tabla detallada para Consumo de Agua y Costo de Nutrientes
-    meses = int(datos["meses_produccion"])  # Número de meses de producción (1.5 para espinaca)
+    meses = int(datos["meses_produccion"])  # Número de meses de producción (2 meses)
     
     # Ajustamos para mostrar dos filas, distribuyendo el consumo de agua y nutrientes
     consumo_agua_mes = consumo_total_agua / meses
     tabla_consumo = pd.DataFrame({
-        "Mes": [1, 2] if especie == "Lechuga" else [1, 2],
+        "Mes": [1, 2],
         "Consumo Agua (litros)": [redondear_cantidad(consumo_agua_mes), redondear_cantidad(consumo_agua_mes)],
         "Costo Nutrientes (S/)": [formatear_numero(consumo_nutrientes_mes_1), formatear_numero(consumo_nutrientes_mes_2)],
     })
