@@ -7,10 +7,10 @@ st.write("Esta herramienta calcula costos, ingresos y ganancias para la producci
 
 # Formato de números (sin decimales)
 def formatear_numero(valor):
-    return f"S/ {int(round(valor)):,}".replace(",", ".")
+    return f"S/ {int(valor):,}".replace(",", ".")
 
 def redondear_cantidad(valor):
-    return int(round(valor))  # Redondeo a enteros para resultados numéricos
+    return int(valor)  # Redondeo a enteros para resultados numéricos sin decimales
 
 # Producción de peces
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
