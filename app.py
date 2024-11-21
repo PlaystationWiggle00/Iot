@@ -21,7 +21,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
             "fca": 1.23,  # Factor de conversión alimenticia
             "costo_alimento_por_kg": 6.30,  # S/
             "meses_produccion": 6,
-            "consumo_mensual": [0.2, 0.4, 0.6, 0.8, 1.0, 1.2],  # kg por pez por mes
+            "consumo_mensual": [0.2, 0.4, 0.6, 0.8, 1.0, 1.2],  # Consumo mensual de alimento (kg por pez)
         },
         "Trucha": {
             "peso_promedio": 0.6,  # kg por pez al final del ciclo
@@ -44,13 +44,15 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     peces_vendibles = cantidad_alevines * (1 - datos["tasa_mortalidad"])
     peso_total_vendible = peces_vendibles * datos["peso_promedio"]
 
-    # Consumo mensual de alimento
-    consumo_total_mensual = [cantidad_alevines * consumo for consumo in datos["consumo_mensual"]]
+    # Consumo total de alimento
+    consumo_total_mensual = [peces_vendibles * consumo for consumo in datos["consumo_mensual"]]
     costo_mensual_alimento = [consumo * datos["costo_alimento_por_kg"] for consumo in consumo_total_mensual]
 
+    # Ajustar consumo total basado en peso final (usando FCA correctamente)
+    consumo_total = peso_total_vendible * datos["fca"]
+    costo_total_alimento = consumo_total * datos["costo_alimento_por_kg"]
+
     # Costos totales
-    consumo_total = sum(consumo_total_mensual)
-    costo_total_alimento = sum(costo_mensual_alimento)
     costo_total_alevines = cantidad_alevines * costo_alevin
     otros_costos = 0.1 * (costo_total_alimento + costo_total_alevines)  # 10% para electricidad, mano de obra, etc.
     costo_total_produccion = costo_total_alimento + costo_total_alevines + otros_costos
