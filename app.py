@@ -7,10 +7,10 @@ st.write("Esta herramienta calcula costos, ingresos y ganancias para la producci
 
 # Formato de números
 def formatear_numero(valor):
-    return f"S/ {valor:,.2f}"
+    return f"S/ {valor:,.2f}"  # Formato con dos decimales
 
 def redondear_cantidad(valor):
-    return int(valor) if isinstance(valor, int) or valor.is_integer() else round(valor, 2)
+    return round(valor, 2)  # Redondeo a dos decimales para resultados numéricos
 
 # Producción de peces
 def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_venta_kilo):
@@ -63,7 +63,7 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
 
     # Resultados generales
     resultados = {
-        "Peces Vendibles": redondear_cantidad(peces_vendibles),
+        "Peces Vendibles": int(peces_vendibles),  # Entero porque son peces
         "Peso Total Vendible (kg)": redondear_cantidad(peso_total_vendible),
         "Consumo Total de Alimento (kg)": redondear_cantidad(consumo_total),
         "Costo Total Alimentación": formatear_numero(costo_total_alimento),
@@ -77,8 +77,8 @@ def calcular_produccion_peces(especie, cantidad_alevines, costo_alevin, precio_v
     # Tabla detallada
     tabla_consumo = pd.DataFrame({
         "Mes": list(range(1, datos["meses_produccion"] + 1)),
-        "Consumo Alimento (kg)": consumo_total_mensual,
-        "Costo Mensual Alimento (S/)": costo_mensual_alimento,
+        "Consumo Alimento (kg)": [redondear_cantidad(val) for val in consumo_total_mensual],
+        "Costo Mensual Alimento (S/)": [formatear_numero(val) for val in costo_mensual_alimento],
     })
 
     return resultados, tabla_consumo
